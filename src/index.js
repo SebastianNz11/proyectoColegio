@@ -2,6 +2,7 @@ import express from "express";
 import { sequelize } from "./database/database.js";
 import "dotenv/config";
 import morgan from "morgan";
+import "./models/relaciones.model.js";
 
 const app = express();
 app.use(express.json());

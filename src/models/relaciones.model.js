@@ -1,0 +1,23 @@
+import { Curso } from "./curso.model.js";
+import { Estudiante } from "./estudiante.model.js";
+import { Grado } from "./grado.model.js";
+import { Mora } from "./mora.model.js";
+import { Nota } from "./nota.model.js";
+import { Padre } from "./padre.model.js";
+import { Pago } from "./pago.model.js";
+import { Profesor } from "./profesor.model.js";
+import { Usuario } from "./usuario.model.js";
+import { Rol } from "./rol.model.js";
+
+Usuario.belongsTo(Rol, { foreignKey: "id_rol" });
+Estudiante.belongsTo(Padre, { foreignKey: "id_padre" });
+Estudiante.belongsTo(Rol, { foreignKey: "id_rol" });
+Estudiante.belongsTo(Grado, { foreignKey: "id_grado" });
+Padre.belongsTo(Rol, { foreignKey: "id_rol" });
+Profesor.belongsTo(Curso, { foreignKey: "id_curso" });
+Profesor.belongsTo(Rol, { foreignKey: "id_rol" });
+Nota.belongsTo(Estudiante, { foreignKey: "id_estudiante" });
+Nota.belongsTo(Curso, { foreignKey: "id_curso" });
+Curso.belongsTo(Grado, { foreignKey: "id_grado" });
+Pago.belongsTo(Padre, { foreignKey: "id_padre" });
+Mora.belongsTo(Pago, { foreignKey: "id_pago" });
