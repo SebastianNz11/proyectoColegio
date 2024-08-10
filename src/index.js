@@ -9,6 +9,7 @@ import routesUsuarios from "./routes/usuario.routes.js";
 import routesPadres from "./routes/padre.routes.js";
 import routesEstudiantes from "./routes/estudiante.routes.js";
 import routesCursos from "./routes/curso.routes.js";
+import routesProfesores from "./routes/profesor.router.js";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(routesUsuarios);
 app.use(routesPadres);
 app.use(routesEstudiantes);
 app.use(routesCursos);
+app.use(routesProfesores);
 
 const main = () => {
   app.listen(process.env.PORT, async () => {
