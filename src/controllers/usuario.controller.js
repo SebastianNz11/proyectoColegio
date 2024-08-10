@@ -1,4 +1,5 @@
 import { Usuario } from "../models/usuario.model.js";
+import bcryptjs from 'bcryptjs'
 
 //CONTROLLADOR PARA TRAER INFORMACION DE USUARIO
 export const getUsuario = async (req, res) => {
@@ -31,15 +32,16 @@ export const getUsuarioById = async (req, res) => {
 };
 
 //CONTROLADOR PARA INSERTAR UN USUARIO
-
 export const insertUsuario = async (req, res) => {
   try {
     const { nombres, apellidos, email, contrasenia, id_rol } = req.body;
+    const salt = await bcryptjs.genSalt(10);
+    const hashPassword = await bcryptjs.hash(contrasenia, salt);
     const usuario = await Usuario.create({
       nombres,
       apellidos,
       email,
-      contrasenia,
+      contrasenia: hashPassword,
       id_rol,
     });
     res.status(200).json(usuario);
