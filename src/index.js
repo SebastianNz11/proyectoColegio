@@ -3,10 +3,12 @@ import { sequelize } from "./database/database.js";
 import "dotenv/config";
 import morgan from "morgan";
 import "./models/relaciones.model.js";
+import routesRoles from './routes/rol.routes.js'
 
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(routesRoles);
 
 const main = () => {
   app.listen(process.env.PORT, async () => {
