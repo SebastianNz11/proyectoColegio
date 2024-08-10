@@ -7,6 +7,7 @@ import routesRoles from "./routes/rol.routes.js";
 import routesGrados from "./routes/grado.routes.js";
 import routesUsuarios from "./routes/usuario.routes.js";
 import routesPadres from "./routes/padre.routes.js";
+import routesEstudiantes from "./routes/estudiante.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use(routesRoles);
 app.use(routesGrados);
 app.use(routesUsuarios);
 app.use(routesPadres);
+app.use(routesEstudiantes);
 
 const main = () => {
   app.listen(process.env.PORT, async () => {

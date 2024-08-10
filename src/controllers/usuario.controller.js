@@ -1,5 +1,5 @@
 import { Usuario } from "../models/usuario.model.js";
-import bcryptjs from 'bcryptjs'
+import bcryptjs from "bcryptjs";
 
 //CONTROLLADOR PARA TRAER INFORMACION DE USUARIO
 export const getUsuario = async (req, res) => {
@@ -59,11 +59,11 @@ export const updateUsuario = async (req, res) => {
     if (!usuario) {
       return res.status(500).json({ msg: "Usuario no encontrado" });
     }
-    (usuario.nombres = nombres),
-      (usuario.apellidos = apellidos),
-      (usuario.email = email),
-      (usuario.contrasenia = contrasenia),
-      (usuario.id_rol = id_rol);
+    usuario.nombres = nombres, 
+    usuario.apellidos = apellidos;
+    usuario.email = email;
+    usuario.contrasenia = contrasenia;
+    usuario.id_rol = id_rol;
     usuario.save();
     res.status(200).json(usuario);
   } catch (error) {
