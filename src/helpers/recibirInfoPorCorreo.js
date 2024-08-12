@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import "dotenv/config";
 
 export const sendEmail = async (nombre, email, mensaje) => {
   let transporter = nodemailer.createTransport({
@@ -6,8 +7,8 @@ export const sendEmail = async (nombre, email, mensaje) => {
     port: 587,
     secure: false,
     auth: {
-      user: "colegiocompilador@gmail.com",
-      pass: "tfhuyvywqfaogdht",
+      user: process.env.CORREO,
+      pass: process.env.CLAVEGOOGLE,
     },
     tls: {
       rejectUnauthorized: false, // Desactiva la verificación del certificado
@@ -17,7 +18,7 @@ export const sendEmail = async (nombre, email, mensaje) => {
   let info = await transporter.sendMail({
     from: `${nombre} ${email}`,
     replyTo: email,
-    to: "colegiocompilador@gmail.com",
+    to: process.env.CORREO,
     subject: "Datos del formulario",
     text: `Nombre: ${nombre}\nEmail: ${email}\nMensaje: ${mensaje}`,
   });
