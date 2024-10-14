@@ -3,9 +3,9 @@ import { sequelize } from "./database/database.js";
 import "dotenv/config";
 import morgan from "morgan";
 import "./models/relaciones.model.js";
+import cors from 'cors'
 import routesRoles from "./routes/rol.routes.js";
 import routesGrados from "./routes/grado.routes.js";
-import routesUsuarios from "./routes/usuario.routes.js";
 import routesPadres from "./routes/padre.routes.js";
 import routesEstudiantes from "./routes/estudiante.routes.js";
 import routesCursos from "./routes/curso.routes.js";
@@ -17,10 +17,16 @@ import routesRecibirEmails from './routes/recibirInfoPorCorreo.routes.js'
 
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "PATCH", "POST", "DELETE", "PUT"],
+  })
+);
+app.use(express.json());
 app.use(morgan("dev"));
 app.use(routesRoles);
 app.use(routesGrados);
-app.use(routesUsuarios);
 app.use(routesPadres);
 app.use(routesEstudiantes);
 app.use(routesCursos);

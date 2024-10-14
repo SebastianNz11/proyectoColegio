@@ -6,10 +6,8 @@ import { Nota } from "./nota.model.js";
 import { Padre } from "./padre.model.js";
 import { Pago } from "./pago.model.js";
 import { Profesor } from "./profesor.model.js";
-import { Usuario } from "./usuario.model.js";
 import { Rol } from "./rol.model.js";
 
-Usuario.belongsTo(Rol, { foreignKey: "id_rol" });
 Estudiante.belongsTo(Padre, { foreignKey: "id_padre" });
 Estudiante.belongsTo(Rol, { foreignKey: "id_rol" });
 Estudiante.belongsTo(Grado, { foreignKey: "id_grado" });

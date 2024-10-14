@@ -1,3 +1,6 @@
+import bcrypt from 'bcryptjs';
+import {generarContrasenia} from '../helpers/generarContrasenia.js'
+import {sendEmail} from '../helpers/sendMail.js'
 import { Profesor } from "../models/profesor.model.js";
 
 //CONTROLADOR PARA TRAER INFORMACION DE PROFESORES
@@ -33,15 +36,33 @@ export const getProfesorById = async (req, res) => {
 //CONTROLADOR PARA INSERTAR UN PROFESOR
 export const insertProfesor = async (req, res) => {
   try {
-    const { nombres, apellidos, id_curso, id_rol } = req.body;
+    const {
+      nombres,
+      apellidos,
+      correo,
+      id_curso,
+      id_rol,
+    } = req.body;
+
+    const contrasenia = generarContrasenia();
+
+    const salt = await bcrypt.genSalt(10);
+    const contraseniaEncriptada = await bcrypt.hash(contrasenia, salt);
+
     const profesor = await Profesor.create({
       nombres,
       apellidos,
+      correo,
+      contrasenia: contraseniaEncriptada,
       id_curso,
       id_rol,
     });
+
+    await sendEmail(nombres, correo, contrasenia);
+
     res.status(200).json(profesor);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: "No se pudo insertar el profesor" });
   }
 };
@@ -50,13 +71,15 @@ export const insertProfesor = async (req, res) => {
 export const updateProfesor = async (req, res) => {
   try {
     const { id_profesor } = req.params;
-    const { nombres, apellidos, id_curso, id_rol } = req.body;
+    const { nombres, apellidos, correo, contrasenia, id_curso, id_rol } = req.body;
     const profesor = await Profesor.findByPk(id_profesor);
     if (!profesor) {
       res.status(404).json({ msg: "No existe el profesor" });
     }
     profesor.nombres = nombres;
     profesor.apellidos = apellidos;
+    profesor.correo = correo;
+    profesor.contrasenia = contrasenia;
     profesor.id_curso = id_curso;
     profesor.id_rol = id_rol;
     profesor.save();

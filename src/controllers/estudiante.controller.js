@@ -1,4 +1,8 @@
+import bcrypt from 'bcryptjs';
+import {generarContrasenia} from '../helpers/generarContrasenia.js'
+import {sendEmail} from '../helpers/sendMail.js'
 import { Estudiante } from "../models/estudiante.model.js";
+
 
 //CONTROLADOR PARA TRAER INFORMACION DE LOS ESTUDIANTES
 export const getEstudiante = async (req, res) => {
@@ -33,16 +37,39 @@ export const getEstudianteById = async (req, res) => {
 //CONTROLADOR PARA INSERTAR UN ESTUDIANTE
 export const insertEstudiante = async (req, res) => {
   try {
-    const { nombres, apellidos, id_padre, id_rol, id_grado } = req.body;
+    const {
+      nombres,
+      apellidos,
+      correo,
+      id_padre,
+      id_rol,
+      id_grado,
+    } = req.body;
+
+    // Generar una contraseña aleatoria
+    const contrasenia = generarContrasenia();
+
+    // Encriptar la contraseña
+    const salt = await bcrypt.genSalt(10);
+    const contraseniaEncriptada = await bcrypt.hash(contrasenia, salt);
+
+    // Insertar el estudiante con la contraseña encriptada
     const estudiante = await Estudiante.create({
       nombres,
       apellidos,
+      correo,
+      contrasenia: contraseniaEncriptada,
       id_padre,
       id_rol,
       id_grado,
     });
+
+    // Enviar la contraseña sin encriptar al correo del estudiante
+    await sendEmail(nombres, correo, contrasenia);
+
     res.status(200).json(estudiante);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: "No se pudo insertar el estudiante" });
   }
 };
@@ -50,7 +77,15 @@ export const insertEstudiante = async (req, res) => {
 //CONTROLADOR PARA ACTUALIZAR INFORMACION DE UN ESTUDIANTE
 export const updateEstudiante = async (req, res) => {
   try {
-    const { nombres, apellidos, id_padre, id_rol, id_grado } = req.body;
+    const {
+      nombres,
+      apellidos,
+      correo,
+      contrasenia,
+      id_padre,
+      id_rol,
+      id_grado,
+    } = req.body;
     const { id_estudiante } = req.params;
     const estudiante = await Estudiante.findByPk(id_estudiante);
     if (!estudiante) {
@@ -58,6 +93,8 @@ export const updateEstudiante = async (req, res) => {
     }
     estudiante.nombres = nombres;
     estudiante.apellidos = apellidos;
+    estudiante.correo = correo;
+    estudiante.contrasenia = contrasenia;
     estudiante.id_padre = id_padre;
     estudiante.id_rol = id_rol;
     estudiante.id_grado = id_grado;
