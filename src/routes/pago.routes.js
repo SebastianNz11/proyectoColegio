@@ -5,6 +5,10 @@ import {
   insertPago,
   updatePago,
   deletePago,
+  hacerPago,
+  verificarMora,
+  generarReportePagosPDF,
+  obtenerPagos
 } from "../controllers/pago.controller.js";
 
 const router = Router();
@@ -14,5 +18,11 @@ router.get("/pagos/:id_pago", getPagoById);
 router.post("/pagos", insertPago);
 router.put("/pagos/:id_pago", updatePago);
 router.delete("/pagos/:id_pago", deletePago);
+router.post("/pago", hacerPago);
+router.get('/padre/:id_padre/mora', verificarMora);
+router.post('/reportes/pagos', generarReportePagosPDF);
+router.get('/pagos', obtenerPagos);
+
+
 
 export default router;

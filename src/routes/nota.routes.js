@@ -1,18 +1,17 @@
-import { Router } from "express";
-import {
-  getNota,
-  getNotaById,
-  insertNota,
-  updateNota,
-  deleteNota,
-} from "../controllers/nota.controller.js";
+import express from 'express';
+import { asignarNota, obtenerEstudiantesCurso, obtenerNotasPorCurso, obtenerNotasPorEstudiante, obtenerNotasPorIdPadre } from '../controllers/nota.controller.js';
 
-const router = Router();
+const router = express.Router();
 
-router.get("/notas", getNota);
-router.get("/notas/:id_nota", getNotaById);
-router.post("/notas", insertNota);
-router.put("/notas/:id_nota", updateNota);
-router.delete("/notas/:id_nota", deleteNota);
+
+
+// Ruta para obtener estudiantes de un curso asignado a un profesor
+router.post('/profesor/:id_profesor/curso/:id_curso/asignar-nota', asignarNota);
+router.get('/curso/:id_curso/estudiantes', obtenerEstudiantesCurso);
+router.get('/cursos/:id_curso/notas', obtenerNotasPorCurso);
+router.get('/:userId/notas', obtenerNotasPorEstudiante);
+router.get('/padre/:id_padre/notas', obtenerNotasPorIdPadre);
+
+
 
 export default router;

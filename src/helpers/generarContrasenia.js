@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+
 export const generarContrasenia = (longitud = 8) => {
     const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
     let contrasenia = '';

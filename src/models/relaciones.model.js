@@ -7,6 +7,8 @@ import { Padre } from "./padre.model.js";
 import { Pago } from "./pago.model.js";
 import { Profesor } from "./profesor.model.js";
 import { Rol } from "./rol.model.js";
+import { Usuario } from "./usuario.model.js";
+
 
 Estudiante.belongsTo(Padre, { foreignKey: "id_padre" });
 Estudiante.belongsTo(Rol, { foreignKey: "id_rol" });
@@ -19,3 +21,8 @@ Nota.belongsTo(Curso, { foreignKey: "id_curso" });
 Curso.belongsTo(Grado, { foreignKey: "id_grado" });
 Pago.belongsTo(Padre, { foreignKey: "id_padre" });
 Mora.belongsTo(Pago, { foreignKey: "id_pago" });
+
+
+// Definición de asociaciones inversas
+Padre.hasMany(Pago, { foreignKey: 'id_padre', as: 'pagos' });
+Pago.hasMany(Mora, { foreignKey: 'id_pago', as: 'moras' });

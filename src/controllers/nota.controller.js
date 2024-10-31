@@ -1,83 +1,155 @@
-import { Nota } from "../models/nota.model.js";
+import { Nota } from '../models/nota.model.js';
+import { Profesor } from '../models/profesor.model.js';
+import { Curso } from '../models/curso.model.js';
+import { Estudiante } from '../models/estudiante.model.js';
 
-//CONTROLADOR PARA TRAER INFORMACION DE LAS NOTAS
-export const getNota = async (req, res) => {
-  try {
-    const notas = await Nota.findAll();
-    res.status(200).json(notas);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "No se pudo obtener la informacion de las notas" });
-  }
-};
 
-//CONTROLADOR PARA TRAER INFORMACION DE UNA NOTA
-export const getNotaById = async (req, res) => {
+// Asignar una nota a los estudiantes del curso
+export const asignarNota = async (req, res) => {
+  const { id_profesor, id_curso } = req.params; // Obtener el ID del profesor y del curso
+  const { bimestre, notas } = req.body; // Notas debe ser un arreglo de objetos { id_estudiante, nota }
+
   try {
-    const { id_nota } = req.params;
-    const notas = await Nota.findOne({
-      where: { id_nota },
+    // Verificar si el profesor tiene asignado ese curso
+    const profesor = await Profesor.findOne({
+      where: { id_profesor, id_curso },
     });
-    if (!notas) {
-      return res.status(400).json({ msg: "No existe la nota" });
+
+    if (!profesor) {
+      return res.status(403).json({ message: 'No tienes acceso a este curso.' });
     }
-    res.status(200).json(notas);
+
+    // Asignar notas a cada estudiante
+    const asignaciones = [];
+
+    for (const { id_estudiante, nota } of notas) {
+      const notaAsignada = await Nota.create({
+        id_estudiante,
+        id_curso,
+        bimestre,
+        nota,
+      });
+      asignaciones.push(notaAsignada);
+    }
+
+    res.status(201).json({ message: 'Notas asignadas exitosamente.', asignaciones });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "No se pudo obtener la informacion de la nota" });
+    console.error('Error al asignar notas:', error);
+    res.status(500).json({ message: 'Error al asignar notas.', error: error.message });
   }
 };
 
-//CONTROLADOR PARA INSERTAR UNA NOTA
-export const insertNota = async (req, res) => {
+
+// Obtener estudiantes de un curso
+export const obtenerEstudiantesCurso = async (req, res) => {
+  const { id_curso } = req.params;
+
   try {
-    const { id_estudiante, id_curso, bimestre, nota } = req.body;
-    const notas = await Nota.create({
-      id_estudiante,
-      id_curso,
-      bimestre,
-      nota,
+    // Obtener estudiantes que están asignados a este curso
+    const estudiantes = await Estudiante.findAll({
+      where: { id_grado: id_curso } // Asumiendo que 'id_grado' se relaciona con 'id_curso', ajusta si es necesario.
     });
-    res.status(200).json(notas);
+
+    if (estudiantes.length === 0) {
+      return res.status(404).json({ message: 'No hay estudiantes asignados a este curso.' });
+    }
+
+    res.json(estudiantes);
   } catch (error) {
-    res.status(500).json({ msg: "No se pudo insertar la nota" });
+    console.error('Error al obtener estudiantes del curso:', error);
+    res.status(500).json({ message: 'Error al obtener estudiantes.', error: error.message });
   }
 };
 
-//CONTROLADOR PARA ACTUALIZAR INFORMACION DE UNA NOTA
-export const updateNota = async (req, res) => {
+
+
+
+
+export const obtenerNotasPorCurso = async (req, res) => {
   try {
-    const { id_nota } = req.params;
-    const { id_estudiante, id_curso, bimestre, nota } = req.body;
-    const notas = await Nota.findByPk(id_nota);
-    if (!notas) {
-      res.status(404).json({ msg: "No existe la nota" });
-    }
-    notas.id_estudiante = id_estudiante;
-    notas.id_curso = id_curso;
-    notas.bimestre = bimestre;
-    notas.nota = nota;
-    notas.save();
-    res.status(200).json(notas);
+      // Obtener el ID del curso desde los parámetros de la solicitud
+      const { id_curso } = req.params;
+
+      // Obtener todas las notas de estudiantes asignados al curso especificado
+      const notas = await Nota.findAll({
+          where: { id_curso: id_curso },
+          include: [
+              {
+                  model: Estudiante,
+                  attributes: ['id_estudiante', 'nombres', 'apellidos'], // Ajusta los atributos según sea necesario
+              }
+          ],
+      });
+
+      // Verifica si se encontraron notas
+      if (notas.length === 0) {
+          return res.status(404).json({ mensaje: 'No se encontraron notas para este curso.' });
+      }
+
+      // Responde con las notas encontradas
+      return res.status(200).json(notas);
   } catch (error) {
-    res.status(500).json({ msg: "No se pudo actualizar la nota" });
+      console.error(error);
+      return res.status(500).json({ mensaje: 'Error al obtener las notas.' });
   }
 };
 
-//CONTROLADOR PARA ELIMINAR UNA NOTA
-export const deleteNota = async (req, res) => {
-  try {
-    const { id_nota } = req.params;
-    const notas = await Nota.destroy({
-      where: { id_nota },
-    });
-    if (!notas) {
-      return res.status(404).json({ msg: "No existe la nota" });
+
+
+
+// controllers/NotasController.js
+export const obtenerNotasPorEstudiante = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Obtener las notas del estudiante
+        const notas = await Nota.findAll({
+            where: { id_estudiante: userId },
+            include: [
+                {
+                    model: Curso,
+                    attributes: ['nombre_curso'], // Incluye el nombre del curso
+                },
+            ],
+        });
+
+        if (notas.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron notas' });
+        }
+
+        res.json(notas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
-    res.status(200).json({ msg: "Nota eliminada con exito" });
+};
+
+
+
+export const obtenerNotasPorIdPadre = async (req, res) => {
+  const { id_padre } = req.params;
+
+  try {
+      // Primero, obtenemos los estudiantes asociados al padre
+      const estudiantes = await Estudiante.findAll({ where: { id_padre } });
+
+      if (estudiantes.length === 0) {
+          return res.status(404).json({ mensaje: 'No se encontraron estudiantes para este padre.' });
+      }
+
+      const notas = await Nota.findAll({
+          where: {
+              id_estudiante: estudiantes.map(estudiante => estudiante.id_estudiante),
+          },
+          include: {
+              model: Curso,
+              as: 'curso', 
+          },
+      });
+
+      res.json(notas);
   } catch (error) {
-    res.status(500).json({ msg: "No se pudo eliminar la nota" });
+      console.error('Error al obtener las notas:', error);
+      res.status(500).json({ mensaje: 'Error del servidor.' });
   }
 };

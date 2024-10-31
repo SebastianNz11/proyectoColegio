@@ -20,7 +20,7 @@ export const Pago = sequelize.define(
     },
     estado: {
       type: DataTypes.STRING,
-    },
+    }
   },
   {
     timestamps: false,
